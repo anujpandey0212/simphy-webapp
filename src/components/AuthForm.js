@@ -2,8 +2,59 @@ import logo200Image from 'assets/img/logo/logo_200.png';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
+import axios from 'axios';
 
 class AuthForm extends React.Component {
+
+  constructor(props){
+    super(props);
+
+    this.onchangeusername=this.onchangeusername.bind(this);
+    this.onchangepassword=this.onchangepassword.bind(this);
+    this.onsubmit=this.onsubmit.bind(this);
+
+    this.state={
+      username:"",
+      password:"",
+    };
+
+  }
+
+  onchangeusername(e){
+    this.setState({
+      username:e.target.value,
+    });
+  };
+
+  onchangepassword(e){
+this.setState({
+  password:e.target.value,
+});
+  };
+
+  onsubmit(e){
+
+    e.preventDefault();
+ 
+    // When post request is sent to the create url, axios will add a new record(newperson) to the database.
+    const newperson = {
+      username: this.state.username,
+      password: this.state.password,
+    };
+ 
+    axios
+      .post("http://localhost:5000/record/add", newperson)
+      .then((res) => console.log(res.data));
+ 
+    // We will empty the state after posting the data to the database
+    this.setState({
+      username: "",
+      password: "",
+    });
+
+  }
+
+
   get isLogin() {
     return this.props.authState === STATE_LOGIN;
   }
@@ -64,11 +115,15 @@ class AuthForm extends React.Component {
         )}
         <FormGroup>
           <Label for={usernameLabel}>{usernameLabel}</Label>
-          <Input {...usernameInputProps} />
+          <Input {...usernameInputProps} 
+            onChange={this.onchangeusername}
+          />
         </FormGroup>
         <FormGroup>
           <Label for={passwordLabel}>{passwordLabel}</Label>
-          <Input {...passwordInputProps} />
+          <Input {...passwordInputProps}
+          onChange={this.onchangepassword}
+          />
         </FormGroup>
         {this.isSignup && (
           <FormGroup>
@@ -87,15 +142,19 @@ class AuthForm extends React.Component {
           size="lg"
           className="bg-gradient-theme-left border-0"
           block
-          onClick={this.handleSubmit}>
+          onClick={this.onsubmit}>
           {this.renderButtonText()}
+          
         </Button>
 
         <div className="text-center pt-1">
           <h6>or</h6>
           <h6>
             {this.isSignup ? (
-              <a href="#login" onClick={this.changeAuthState(STATE_LOGIN)}>
+              <a href="#login" onClick={this.changeAuthState(STATE_LOGIN),
+                onLogoClick
+              
+              }>
                 Login
               </a>
             ) : (
